@@ -1,0 +1,11 @@
+config.ini
+*.pkl
+*.pdf
+*.html
+__pycache__/
+*.py[cod]
+*$py.class
+*.txt
+!requirements.txt
+tailor-cv-env
+output

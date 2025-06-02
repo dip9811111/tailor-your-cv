@@ -1,0 +1,5 @@
+langchain_openai==0.3.18
+markitdown[all]==0.1.2
+pydantic==2.11.5
+streamlit==1.45.1
+weasyprint==65.1
