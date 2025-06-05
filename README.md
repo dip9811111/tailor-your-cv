@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/e023e563-8e6b-4cd4-8958-7df612605c4a
+
 # 🎯 tailor-your-CV: AI-Powered Job-Tailored Resume Generator
 
 tailor-your-CV is a powerful tool that helps users craft customized, high-impact resumes based on job descriptions using OpenAI GPT-4.1. Simply upload your professional experience, paste a job description, and let the LLM generate a tailored curriculum vitae aligned with your target role — all based on your chosen template.
