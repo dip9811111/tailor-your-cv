@@ -1,93 +1,101 @@
 
 import json
 import os
+import pickle
 import streamlit as st
 
 from support.extractor import InformationExtractor
+from support.html_builder import render_editable_cv
 from support.load_models import load_openAI_model
 from support.manage_ingestion import process_file
-from support.settings import api_key_value
+from support.settings import api_key_value, TESTING, dest_dir
 
 
-st.title("AI CV Builder")
-api_key = st.sidebar.text_input(
-    "Enter your OpenAI API key",
-    value=api_key_value,
-    type="password"
-)
+st.set_page_config(layout="wide")
+st.markdown("<h1 style='text-align: center;'>AI CV Builder</h1>", unsafe_allow_html=True)
+
+auto_click_html = """
+<script>
+    const sidebar = window.parent.document.querySelector('[data-testid="stSidebar"]');
+    if (sidebar) {
+        const button = sidebar.querySelector('button');
+        if (button) {
+            button.click();
+        }
+    }
+</script>
+"""
+
+with st.sidebar.expander("🔐 OpenAI API Key", expanded=True):
+    api_key = st.text_input("Enter your OpenAI API key", value=api_key_value, type="password")
+    uploaded_file = st.file_uploader("Upload your CV file", type=["pdf", "txt", "docx", "md"])
+    job_description = st.text_area("Paste the job description here")
+    if st.button("🪄 Generate my new CV"):
+        st.session_state.generate_cv_trigger = True
+        st.components.v1.html(auto_click_html, height=0)
 
 if api_key:
     os.environ["OPENAI_API_KEY"] = api_key
 
-uploaded_file = st.file_uploader("Upload your CV file")
-if uploaded_file:
-    if "structured_cv" not in st.session_state:
-        if api_key:
-            with st.spinner("Processing file..."):
-                markdown_cv = process_file(uploaded_file)
-                if markdown_cv:
-                    error_ = False  
-                    st.session_state.information_extractor = InformationExtractor()
-                    st.session_state.information_extractor.MODEL = load_openAI_model()
-                    structured_cv = st.session_state.information_extractor.extract_data(
-                        markdown_cv=markdown_cv,
-                        is_new_cv=True
-                    )
-                    st.session_state.structured_cv = structured_cv
-                    with st.chat_message("assistant"):
-                        response_json = structured_cv.model_dump()
-                        st.markdown(f"```json\n{json.dumps(response_json, indent=2)}\n```")
+left_col, right_col = st.columns([1, 1], gap="large")
+with left_col:
+    if uploaded_file:
+        if "structured_cv" not in st.session_state:
+            if api_key:
+                with st.spinner("Processing file..."):
+                    markdown_cv = process_file(uploaded_file)
+                    if markdown_cv:
+                        error_ = False  
+                        st.session_state.information_extractor = InformationExtractor()
+                        st.session_state.information_extractor.MODEL = load_openAI_model()
+                        structured_cv = st.session_state.information_extractor.extract_data(
+                            markdown_cv=markdown_cv,
+                            is_new_cv=True
+                        )
+                        st.session_state.structured_cv = structured_cv
+                    else:
+                        error_ = True
+                if not error_:
+                    st.success("File processed successfully.")
                 else:
-                    error_ = True
-            if not error_:
-                st.success("File processed successfully.")
+                    st.warning("Error processing file. Are you sure file is .pdf, .txt, .docx, .md?")
             else:
-                st.warning("Error processing file. Are you sure file is .pdf, .txt, .docx, .md?")
+                st.warning("Please provide your API key before.")
+
+    if "final_cv" in st.session_state:
+        render_editable_cv(st.session_state.final_cv)
+
+    if st.session_state.get("generate_cv_trigger"):
+        st.session_state.generate_cv_trigger = False  # Reset trigger
+        if not api_key or not os.path.exists(f"{dest_dir}/user_curriculum.md") or not job_description:
+            st.warning("Please provide your API key, upload a CV file, and paste a job description.")
         else:
-            st.warning("Please provide your API key before.")
-
-job_description = st.text_area("Paste the job description here")
-
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-if st.button("Build my new CV"):
-    if not api_key or not os.path.exists("output/user_curriculum.md") or not job_description:
-        st.warning("Please provide your API key, upload a CV file, and paste a job description.")
-    else:
-        if "information_extractor" not in st.session_state:
-            st.session_state.information_extractor = InformationExtractor()
-            st.session_state.information_extractor.MODEL = load_openAI_model()
-            st.session_state.information_extractor.extract_data()
-        with st.chat_message("assistant"):
+            if "information_extractor" not in st.session_state:
+                st.session_state.information_extractor = InformationExtractor()
+                st.session_state.information_extractor.MODEL = load_openAI_model()
+                st.session_state.information_extractor.extract_data()
             with st.spinner("Generating your CV..."):
                 try:
-                    final_cv = st.session_state.information_extractor.create_new_cv(
-                        structured_curriculum=st.session_state.information_extractor.structured_cv,
-                        job_description=job_description
-                    )
-                    response_json = final_cv.model_dump()
-                    st.session_state.messages.append(
-                        {
-                            "role": "assistant",
-                            "content": f"```json\n{json.dumps(response_json, indent=2)}\n```"
-                        }
-                    )
-                    st.markdown(f"```json\n{json.dumps(response_json, indent=2)}\n```")
-                    st.session_state.information_extractor.build_final_CV()
-                    if os.path.exists(st.session_state.information_extractor.generated_pdf_path):
-                        with open(st.session_state.information_extractor.generated_pdf_path, "rb") as pdf_file:
-                            pdf_bytes = pdf_file.read()
-
-                        st.download_button(
-                            label="📄 Download CV as PDF",
-                            data=pdf_bytes,
-                            file_name="my_new_cv.pdf",
-                            mime="application/pdf"
+                    if not TESTING:
+                        new_cv = st.session_state.information_extractor.create_new_cv(
+                            structured_curriculum=st.session_state.information_extractor.structured_cv,
+                            job_description=job_description
                         )
+                    else:
+                        with open(st.session_state.information_extractor.new_cv_path, 'rb') as file:
+                            new_cv = pickle.load(file)
+                        st.session_state.information_extractor.new_cv = new_cv
+                    
+                    response_json = new_cv.model_dump()
+                    generated_html = st.session_state.information_extractor.build_final_cv()
+                    st.session_state.final_cv = st.session_state.information_extractor.final_cv
+                    render_editable_cv(st.session_state.information_extractor.final_cv)
+                    st.session_state.final_cv_content = st.session_state.information_extractor.final_cv
+                    st.session_state.generated_html = generated_html
                 except Exception as e:
                     st.error(f"Failed to process the CV with the model: {e}")
+
+with right_col:
+    if "final_cv_content" in st.session_state:
+        if "generated_html" in st.session_state:
+            st.html(st.session_state.generated_html)

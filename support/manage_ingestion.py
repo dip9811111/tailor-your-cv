@@ -3,10 +3,11 @@ import tempfile
 
 from markitdown import MarkItDown
 from support.logger_manager import logger
+from support.settings import dest_dir
 
 
 def save_output(content):
-    with open("output/user_curriculum.md", "w", encoding="utf-8") as f:
+    with open(f"{dest_dir}/user_curriculum.md", "w", encoding="utf-8") as f:
         f.write(content)
     logger.debug("Markdown written to user_curriculum.md")
 

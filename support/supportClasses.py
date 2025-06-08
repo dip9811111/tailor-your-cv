@@ -128,7 +128,6 @@ class NewCurriculum(BaseModel):
 
 class FinalCurriculum:
     def __init__(self, personality, summary, experiences, projects, education, hard_skills, soft_skills):
-
         self.personality = personality
         self.experiences = experiences
         self.projects = projects

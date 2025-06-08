@@ -9,3 +9,8 @@ __pycache__/
 !requirements.txt
 tailor-cv-env
 output
+
+!test/*.pkl
+!test/*.pdf
+!test/*.md
+!test/*.html
