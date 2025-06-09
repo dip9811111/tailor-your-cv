@@ -8,6 +8,7 @@ if TESTING:
     dest_dir = "test"
 else:
     dest_dir = "output"
+    api_key_value = ""
     if os.path.exists("config.ini"):
         config = configparser.ConfigParser()
         config.read("config.ini")
