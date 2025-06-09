@@ -4,78 +4,100 @@ from typing import List, Optional
 
 class Experience(BaseModel):
     title: Optional[str] = Field(
-        description="Title or position held in a past experience listed in the original CV."
+        default=None,
+        description="Title or position held in a past experience listed in the original CV.",
     )
     company: Optional[str] = Field(
+        default=None,
         description="Name of the company or organization listed in the original CV."
     )
     description: Optional[str] = Field(
+        default=None,
         description="Brief explanation or bullet points describing the responsibilities and achievements in this experience."
     )
     start_date: Optional[str] = Field(
+        default=None,
         description="Starting date (or year) of this experience."
     )
     end_date: Optional[str] = Field(
+        default=None,
         description="End_date date (or year) of this experience."
     )
 
 
 class EducationExperience(BaseModel):
     title: Optional[str] = Field(
+        default=None,
         description="Title of the education experience listed in the original CV."
     )
     school_name: Optional[str] = Field(
+        default=None,
         description="Name of the school or university listed in the original CV."
     )
     description: Optional[str] = Field(
+        default=None,
         description="Brief explanation or bullet points describing the responsibilities and achievements in this experience, including grade and learnt skills."
     )
     start_date: Optional[str] = Field(
+        default=None,
         description="Starting date (or year) of this experience."
     )
     end_date: Optional[str] = Field(
+        default=None,
         description="End_date date (or year) of this experience."
     )
 
 
 class NewExperience(BaseModel):
     title: Optional[str] = Field(
+        default=None,
         description="Title or position for a proposed experience tailored to match job requirements."
     )
     company: Optional[str] = Field(
+        default=None,
         description="Name of the company or organization listed in the original CV."
     )
     description: Optional[str] = Field(
+        default=None,
         description="Generated description for this tailored experience, optimized to reflect alignment with the job description."
     )
     reasoning: Optional[str] = Field(
+        default=None,
         description="Justification for including this experience in the revised CV based on relevance to the target job."
     )
     start_date: Optional[str] = Field(
+        default=None,
         description="Starting date (or year) of this experience."
     )
     end_date: Optional[str] = Field(
+        default=None,
         description="End_date date (or year) of this experience."
     )
 
 
 class Personality(BaseModel):
     name: Optional[str] = Field(
+        default=None,
         description="First name of the CV holder."
     )
     surname: Optional[str] = Field(
+        default=None,
         description="Last name (surname) of the CV holder."
     )
     e_mail: Optional[str] = Field(
+        default=None,
         description="e-mail to contact the CV holder."
     )
     telephone: Optional[str] = Field(
+        default=None,
         description="Phone number to contact the CV holder."
     )
     linkedin_link: Optional[str] = Field(
+        default=None,
         description="URL to the CV holder's LinkedIn profile."
     )
     address: Optional[str] = Field(
+        default=None,
         description="Physical or mailing address of the CV holder."
     )
 
