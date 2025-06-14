@@ -134,6 +134,10 @@ class Curriculum(BaseModel):
 
 
 class NewCurriculum(BaseModel):
+    job_title: Optional[str] = Field(
+        default=None,
+        description="Job position that matches the job description."
+    )
     experiences: Optional[List[NewExperience]] = Field(
         default=None,
         description="Newly generated work-experiences curated to best align with the job requirements. Each includes reasoning for selection."
@@ -149,8 +153,9 @@ class NewCurriculum(BaseModel):
 
 
 class FinalCurriculum:
-    def __init__(self, personality, summary, experiences, projects, education, hard_skills, soft_skills):
+    def __init__(self, personality, job_title, summary, experiences, projects, education, hard_skills, soft_skills):
         self.personality = personality
+        self.job_title = job_title
         self.experiences = experiences
         self.projects = projects
         self.summary = summary

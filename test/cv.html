@@ -1,209 +1,189 @@
 
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            @page {
-                margin: 0.5cm;
-                size: A4;
-            }
-
-            body {
-                font-family: Arial, sans-serif;
-                max-width: 800px;
-                margin: auto;
-                padding: 20px;
-                line-height: 1.2;
-                color: #333;
-                background-color: white;
-                font-size: 12px;
-            }
-
-            .header {
-                text-align: center;
-                margin-bottom: 15px;
-            }
-
-            .name {
-                font-size: 32px;
-                font-weight: bold;
-                color: #6B46C1;
-                margin-bottom: 5px;
-                letter-spacing: 1px;
-                margin-top: -20px;
-            }
-
-            .contact-info {
-                font-size: 11px;
-                color: #666;
-                margin-top: 8px;
-            }
-
-            .contact-info a {
-                color: #6B46C1;
-                text-decoration: none;
-            }
-
-            .contact-info a:hover {
-                text-decoration: underline;
-            }
-
-            .section {
-                margin-bottom: 15px;
-            }
-
-            .section-title {
-                font-size: 18px;
-                font-weight: bold;
-                color: #6B46C1;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                margin-bottom: 10px;
-                padding-bottom: 2px;
-                border-bottom: 1.5px solid #6B46C1;
-            }
-
-            .experience-entry, .education-entry, .project-entry {
-                margin-bottom: 10px;
-            }
-
-            .entry-header {
-                margin-bottom: 2px;
-                color: #333;
-                font-size: 12px;
-            }
-
-            .summary-text {
-                text-align: justify;
-                margin-bottom: 0;
-                font-size: 11px;
-                line-height: 1.3;
-            }
-
-            .skills-content {
-                font-size: 11px;
-                line-height: 1.4;
-            }
-
-            p {
-                margin: 3px 0;
-                font-size: 11px;
-                text-align: justify;
-                line-height: 1.3;
-            }
-
-            .two-column {
-                display: flex;
-                gap: 25px;
-                margin-bottom: 15px;
-            }
-
-            .column {
-                flex: 1;
-            }
-
-            @media (max-width: 600px) {
-                .two-column {
-                    flex-direction: column;
-                    gap: 20px;
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8" />
+            <style>
+                @page { size: A4; margin: 0.25in; }
+                * { box-sizing: border-box; }
+                body {
+                    font-family: Arial, sans-serif;
+                    font-size: 11px;
+                    line-height: 1.3;
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    height: 100vh;
+                    max-height: 10.5in;
                 }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <div class="name">LUCAS BENNETT</div>
-            <div class="contact-info">
-                <span class="contact-item">📍 2894 Bryant Street, San Francisco, CA, 94110</span> <span class="contact-item">📞 +1 (415) 555-2034</span> <span class="contact-item">✉️ lucas.bennett.ai@gmail.com</span> <span class="contact-item">💼 <a href="linkedin.com/in/lucas-bennett-ai">linkedin.com/in/lucas-bennett-ai</a></span>
-            </div>
-        </div>
 
-        <div class="section">
-            <div class="section-title">Summary</div>
-            <p class="summary-text">I am an AI engineer and researcher with a strong track record of delivering robust, scalable, and impactful AI solutions. My experience spans end-to-end product development, from ideation and research to production deployment, across domains such as fraud detection, NLP, and computer vision. I thrive in collaborative, fast-paced environments, consistently driving projects that push the boundaries of AI while maintaining a strong focus on quality, reproducibility, and real-world impact. I am passionate about learning, sharing knowledge, and contributing to teams that value ambition, ownership, and ethical standards.</p>
-        </div>
+                #container {
+                    display: flex;
+                    width: 100%;
+                    height: 100%;
+                }
 
-        <div class="section">
-            <div class="section-title">Work Experience</div>
-            
-        <div class="experience-entry">
-            <div class="entry-header">
-                <strong>AI Engineer - DeepMetric Labs</strong> (Jan 2023 - Present)
-            </div>
-            <p>At DeepMetric Labs, I designed and implemented a real-time fraud detection system using graph neural networks, reducing false positives by 34%. I spearheaded the deployment of robust ML pipelines using MLflow and Docker across distributed AWS infrastructure, ensuring our solutions were scalable and production-ready. I collaborated closely with data science and DevOps teams to streamline model testing and CI/CD, driving projects from ideation to production and delivering tangible business impact.</p>
-        </div>
-        
-        <div class="experience-entry">
-            <div class="entry-header">
-                <strong>Machine Learning Researcher - NovaCortex AI</strong> (Sep 2020 - Dec 2022)
-            </div>
-            <p>At NovaCortex AI, I developed a custom transformer-based architecture for sentiment-aware summarization, improving ROUGE scores by 17%. I published research in top-tier AI conferences (NeurIPS, ACL) and led internal workshops on explainable AI and model interpretability tools (SHAP, LIME). My work involved exploring new models and techniques, rapidly learning across domains, and sharing findings to elevate team capabilities.</p>
-        </div>
-        
-        </div>
+                #main {
+                    flex: 7.5;
+                    padding: 1rem;
+                    overflow: hidden;
+                }
+                
+                aside {
+                    flex: 2.5;
+                    background: #f8f8f8;
+                    padding: 1rem;
+                    font-size: 10px;
+                    overflow: auto;
+                }
+                h1 {
+                    margin: 0 0 0.5rem 0;
+                    font-size: 26px;
+                    line-height: 1.2;
+                }
+                h2 {
+                    color: #8B0000;
+                    border-bottom: 1px solid #8B0000;
+                    padding-bottom: 2px;
+                    margin: 0.8rem 0 0.5rem 0;
+                    font-size: 18px;
+                }
+                h3 {
+                    border-bottom: 1px solid #ccc;
+                    margin: 0.8rem 0 0.3rem 0;
+                    font-size: 12px;
+                    padding-bottom: 2px;
+                }
+                .job_title{
+                    font-size: 14px;
+                }
+                .section-block {
+                    margin-bottom: 0.8rem;
+                }
+                .entry {
+                    margin-bottom: 0.6rem;
+                    page-break-inside: avoid;
+                }
+                .entry-header {
+                    margin-bottom: 0.2rem;
+                    line-height: 1.2;
+                }
+                .entry-header strong {
+                    font-size: 16px;
+                }
+                .entry strong {
+                    font-size: 14px;
+                }
+                .cv-date {
+                    font-size: 12px;
+                    color: #333;
+                    margin-left: 0.4rem;
+                    font-weight: bold;
+                }
+                p {
+                    margin: 0.2rem 0;
+                    line-height: 1.3;
+                    font-size: 12px;
+                }
+                .sidebar-section {
+                    margin-bottom: 0.8rem;
+                }
+                .contact-item {
+                    margin-bottom: 0.3rem;
+                    font-size: 9px;
+                    line-height: 1.2;
+                    word-break: break-word;
+                }
+                .skills-content {
+                    font-size: 11px;
+                    line-height: 1.3;
+                    word-wrap: break-word;
+                }
+                a {
+                    color: #8B0000;
+                    text-decoration: none;
+                    word-break: break-all;
+                }
+            </style>
+        </head>
+        <body>
+            <div id="container">
+                <section id="main">
+                    <h1>LUCAS BENNETT</h1>
+                    <div class="job_title">Data Scientist / Machine Learning Engineer</div>
+                    <div class="section-block">
+                        <h2>SUMMARY</h2>
+                        <p>I am an experienced AI Engineer and Machine Learning Researcher with a strong background in developing, deploying, and communicating advanced machine learning solutions. My expertise spans Python, deep learning, statistical analysis, and end-to-end model deployment using tools such as Docker, MLflow, and AWS. I have a proven track record of translating business questions into scalable data science solutions, working with sensor and telemetry data, and presenting complex findings to both technical and non-technical stakeholders. I thrive in fast-paced, multidisciplinary teams and am passionate about driving innovation and delivering value across diverse business domains.</p>
+                    </div>
 
-        <div class="section">
-            <div class="section-title">Projects</div>
-            
-        <div class="project-entry">
-            <div class="entry-header">
-                <strong>AutoPilotSim – Self-Driving Car Simulation Platform - </strong> 
-            </div>
-            <p>I built a reinforcement learning environment in Unity using ML-Agents to train agents on lane-following and obstacle avoidance. I integrated PPO and SAC algorithms with real-time telemetry visualization, demonstrating my ability to deliver complex AI solutions from concept to functional product.</p>
+                    <div class="section-block">
+                        <h2>EXPERIENCES</h2>
+                        
+        <div class="entry">
+            <strong>AI Engineer - DeepMetric Labs</strong> <span class="cv-date">(Jan 2023 - Present)</span>
+            <p>As an AI Engineer, I designed and implemented a real-time fraud detection system using graph neural networks, which reduced false positives by 34%. I led the deployment of machine learning pipelines using MLflow and Docker across distributed AWS infrastructure, ensuring scalable and reliable model delivery. I collaborated closely with data science and DevOps teams to streamline model testing and CI/CD processes, and regularly communicated complex technical concepts to both technical and non-technical stakeholders.</p>
         </div>
         
-        <div class="project-entry">
-            <div class="entry-header">
-                <strong>FaceGuard – Deepfake Detection Tool - </strong> 
-            </div>
-            <p>I designed a binary classification model using EfficientNet and LSTM to detect facial manipulation in videos, achieving 94% accuracy on the DeepFake Detection Challenge dataset. I implemented Grad-CAM for interpretability and confidence heatmaps, ensuring transparency and trust in model predictions.</p>
+        <div class="entry">
+            <strong>Machine Learning Researcher - NovaCortex AI</strong> <span class="cv-date">(Sep 2020 - Dec 2022)</span>
+            <p>At NovaCortex AI, I developed a custom transformer-based architecture for sentiment-aware summarization, improving ROUGE scores by 17%. I published research in top-tier AI conferences and led internal workshops on explainable AI and model interpretability tools such as SHAP and LIME. My work involved translating business questions into data science problems, developing and tuning models, and presenting findings to diverse audiences.</p>
         </div>
         
-        <div class="project-entry">
-            <div class="entry-header">
-                <strong>MedNerPro – Clinical Entity Recognition System - </strong> 
-            </div>
-            <p>I developed a deep learning pipeline for extracting medical entities from unstructured clinical notes, combining BiLSTM-CRF and BERT-based embeddings (BioBERT) to achieve a 91.3% F1 score on the i2b2 dataset. I integrated spaCy and Streamlit to create an interactive demo for real-time analysis, with a strong focus on data privacy and compliance.</p>
-        </div>
-        
-        </div>
+                    </div>
 
-        <div class="section">
-            <div class="section-title">Education</div>
-            
-        <div class="education-entry">
-            <div class="entry-header">
-                <strong>M.Sc. in Artificial Intelligence, University of California, Berkeley </strong> (2018 - 2020)
-            </div>
+                    <div class="section-block">
+                        <h2>SELECTED PROJECTS</h2>
+                        
+        <div class="entry">
+            <strong>AutoPilotSim – Self-Driving Car Simulation Platform</strong> <span class="cv-date"></span>
+            <p>I built a reinforcement learning environment in Unity using ML-Agents to train agents on lane-following and obstacle avoidance. I integrated PPO and SAC algorithms with real-time telemetry visualization, demonstrating my ability to work with sensor and telemetry data in a simulated IoT context.</p>
+        </div>
+        
+        <div class="entry">
+            <strong>FaceGuard – Deepfake Detection Tool</strong> <span class="cv-date"></span>
+            <p>I designed a binary classification model using EfficientNet and LSTM to detect facial manipulation in videos, achieving 94% accuracy on the DeepFake Detection Challenge dataset. I implemented Grad-CAM for interpretability and confidence heatmaps, ensuring transparency in model predictions.</p>
+        </div>
+        
+        <div class="entry">
+            <strong>MedNerPro – Clinical Entity Recognition System</strong> <span class="cv-date"></span>
+            <p>I developed a deep learning pipeline for extracting medical entities from unstructured clinical notes, combining BiLSTM-CRF and BERT-based embeddings (BioBERT) to achieve a 91.3% F1 score on the i2b2 dataset. I integrated spaCy and Streamlit to create an interactive demo for real-time analysis, focusing on privacy-preserving training techniques.</p>
+        </div>
+        
+                    </div>
+
+                    <div class="section-block">
+                        <h2>EDUCATION</h2>
+                        
+        <div class="entry">
+            <strong>M.Sc. in Artificial Intelligence, University of California, Berkeley</strong> <span class="cv-date">(2018 - 2020)</span>
             <p>GPA: 3.9/4.0</p>
         </div>
         
-        <div class="education-entry">
-            <div class="entry-header">
-                <strong>B.Sc. in Computer Science, University of Washington </strong> (2014 - 2018)
-            </div>
+        <div class="entry">
+            <strong>B.Sc. in Computer Science, University of Washington</strong> <span class="cv-date">(2014 - 2018)</span>
             <p>GPA: 3.8/4.0</p>
         </div>
         
-        </div>
+                    </div>
+                </section>
 
-        <div class="two-column">
-            <div class="column">
-                <div class="section">
-                    <div class="section-title">Hard Skills</div>
-                    <div class="skills-content">Python • PyTorch • TensorFlow • scikit-learn • Transformers (HuggingFace) • OpenAI API • LangChain • Reinforcement Learning • Computer Vision • NLP • MLops: Docker • MLflow • Airflow • AWS Sagemaker • Git • Linux • REST APIs • SQL</div>
-                </div>
+                <aside>
+                    <div class="sidebar-section">
+                        <h3>CONTACT INFO</h3>
+                        📍 2894 Bryant Street, San Francisco, CA, 94110 | 📞 +1 (415) 555-2034 | ✉️ lucas.bennett.ai@gmail.com | 💼 linkedin.com/in/lucas-bennett-ai
+                    </div>
+                    <div class="sidebar-section">
+                        <h3>HARD SKILLS</h3>
+                        <div class="skills-content">
+                            Python • PyTorch • TensorFlow • scikit-learn • Transformers (HuggingFace) • OpenAI API • LangChain • Reinforcement Learning • Computer Vision • NLP • MLops: Docker • MLflow • Airflow • AWS Sagemaker • Git • Linux • REST APIs • SQL
+                        </div>
+                        <h3>SOFT SKILLS</h3>
+                        <div class="skills-content">
+                            Strong analytical and problem-solving mindset • Clear technical communicator • Passionate about learning and knowledge sharing • Excellent team collaboration and mentorship experience • Adaptable in fast-paced, agile environments
+                        </div>
+                    </div>
+                </aside>
             </div>
-
-            <div class="column">
-                <div class="section">
-                    <div class="section-title">Soft Skills</div>
-                    <div class="skills-content">Strong analytical and problem-solving mindset • Clear technical communicator • Passionate about learning and knowledge sharing • Excellent team collaboration and mentorship experience • Adaptable in fast-paced, agile environments</div>
-                </div>
-            </div>
-        </div>
-
-    </body>
-    </html>
-    
+        </body>
+        </html>
+        

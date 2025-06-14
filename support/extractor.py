@@ -2,7 +2,7 @@ import os
 import pickle
 import weasyprint
 
-from support.html_builder import build_html_from_cv
+from support.html_builder import CVBuilder
 from support.settings import dest_dir
 from support.supportClasses import Curriculum, NewCurriculum, FinalCurriculum
 from support.supportLLM import system_prompt_data_extraction, system_prompt_curriculum_creation
@@ -93,11 +93,12 @@ class InformationExtractor:
 
         return new_structured_cv
 
-    def build_final_cv(self, update_final_cv=False):
+    def build_final_cv(self, update_final_cv=False, template_id="1"):
 
         if not update_final_cv:
             final_CV = FinalCurriculum(
                 personality=self.structured_cv.personality,
+                job_title=self.new_cv.job_title,
                 summary=self.new_cv.summary,
                 experiences=self.new_cv.experiences,
                 projects=self.new_cv.projects,
@@ -111,7 +112,12 @@ class InformationExtractor:
             with open(f'{dest_dir}/final_cv.pkl', 'wb') as f:
                 pickle.dump(final_CV, f)
 
-        html_content = build_html_from_cv(self.final_cv)
+        cv_builder = CVBuilder()
+        html_content = cv_builder.build_html_from_cv(
+            cv=self.final_cv, 
+            template_id=template_id,
+            dest_dir=dest_dir
+        )
         self.generated_html = html_content
 
         return self.generated_html

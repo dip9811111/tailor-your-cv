@@ -2,15 +2,26 @@ import base64
 import os
 import streamlit as st
 
+from string import Formatter
 from support.settings import dest_dir
+from support.html_templates.html_templates import CVTemplates
 
 
-def build_html_from_cv(cv):
+class CVBuilder:
+    """Main CV builder class that handles template injection"""
+    
+    def __init__(self):
+        self.templates = CVTemplates()
 
-    def convert_date(element):
+    def find_template_placeholders(self, template_string):
+        """Find all placeholders in a template string"""
+        formatter = Formatter()
+        placeholders = [field_name for _, field_name, _, _ in formatter.parse(template_string) if field_name]
+        return set(placeholders)
+    
+    def convert_date(self, element):
+        """Convert date elements to formatted string"""
         date_string = ""
-
-        # Normalize None/null values to empty strings for consistent checking
         start_date = element.start_date if element.start_date not in [None, "", "null"] else ""
         end_date = element.end_date if element.end_date not in [None, "", "null"] else ""
 
@@ -19,235 +30,143 @@ def build_html_from_cv(cv):
         elif start_date:
             date_string = f"({start_date})"
         elif end_date:
-            date_string = f"({end_date})"  # Fixed: was assigning to element instead of date_string
+            date_string = f"({end_date})"
 
         return date_string
 
-    def format_experience(exp):
+    def format_experience(self, exp):
+        """Format experience entry"""
+        title = exp.title or ''
+        company = f" - {exp.company}" if exp.company else ''
         return f"""
-        <div class="experience-entry">
-            <div class="entry-header">
-                <strong>{exp.title or ''} - {exp.company or ''}</strong> {convert_date(exp)}
-            </div>
+        <div class="entry">
+            <strong>{title}{company}</strong> <span class="cv-date">{self.convert_date(exp)}</span>
             <p>{exp.description or ''}</p>
         </div>
         """
 
-    def format_education(edu):
+    def format_education(self, edu):
+        """Format education entry"""
+        title = edu.title or ''
+        school = f", {edu.school_name}" if edu.school_name else ''
         return f"""
-        <div class="education-entry">
-            <div class="entry-header">
-                <strong>{edu.title or ''}, {edu.school_name or ''} </strong> {convert_date(edu)}
-            </div>
+        <div class="entry">
+            <strong>{title}{school}</strong> <span class="cv-date">{self.convert_date(edu)}</span>
             <p>{edu.description or ''}</p>
         </div>
         """
 
-    def format_projects(proj):
+    def format_projects(self, proj):
+        """Format project entry"""
+        title = proj.title or ''
+        company = f" - {proj.company}" if proj.company else ''
         return f"""
-        <div class="project-entry">
-            <div class="entry-header">
-                <strong>{proj.title or ''} - {proj.company or ''}</strong> {convert_date(proj)}
-            </div>
+        <div class="entry">
+            <strong>{title}{company}</strong> <span class="cv-date">{self.convert_date(proj)}</span>
             <p>{proj.description or ''}</p>
         </div>
         """
 
-    def format_contact_info(cv):
+    def format_contact_info(self, cv):
+        """Format contact information"""
         contact_parts = []
 
         if cv.personality.address:
-            contact_parts.append(f'<span class="contact-item">📍 {cv.personality.address}</span>')
-
+            contact_parts.append(f'📍 {cv.personality.address}')
         if cv.personality.telephone:
-            contact_parts.append(f'<span class="contact-item">📞 {cv.personality.telephone}</span>')
-
+            contact_parts.append(f'📞 {cv.personality.telephone}')
         if cv.personality.e_mail:
-            contact_parts.append(f'<span class="contact-item">✉️ {cv.personality.e_mail}</span>')
-
+            contact_parts.append(f'✉️ {cv.personality.e_mail}')
         if cv.personality.linkedin_link:
-            contact_parts.append(f'<span class="contact-item">💼 <a href="{cv.personality.linkedin_link}">{cv.personality.linkedin_link}</a></span>')
+            contact_parts.append(f'💼 {cv.personality.linkedin_link}')
 
-        return " ".join(c for c in contact_parts)
+        return " | ".join(contact_parts)
 
-    def format_skills_list(skills):
-        if not skills:
-            return ""
-        return " • ".join(skills)
+    def format_skills_list(self, skills):
+        """Format skills list"""
+        all_skills = []
+        if skills:
+            all_skills.extend(skills)
+        return " • ".join(all_skills)
 
-    html_template = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            @page {{
-                margin: 0.5cm;
-                size: A4;
-            }}
+    def build_html_from_cv(self, cv, template_id="1", dest_dir="./"):
+        """
+        Build HTML from CV data using specified template
+        
+        Args:
+            cv: CV data object
+            template_id: ID of template to use ('1', '2', '3')
+            dest_dir: Destination directory for output
+        """
+        
+        # Get the template
+        template_method = getattr(self.templates, f"template_{template_id}", None)
+        if not template_method:
+            raise ValueError(f"Template '{template_id}' not found. Available: modern, classic, minimalist")
+        
+        template = template_method()
+        
+        # Prepare data for injection
+        template_data = {
+            'name': cv.personality.name or '',
+            'surname': cv.personality.surname or '',
+            'job_title': cv.job_title,
+            'experiences': ''.join(self.format_experience(exp) for exp in cv.experiences or []),
+            'education': ''.join(self.format_education(edu) for edu in cv.education or []),
+            'projects': ''.join(self.format_projects(proj) for proj in cv.projects or []),
+            'contact_info': self.format_contact_info(cv),
+            'hard_skills': self.format_skills_list(cv.hard_skills),
+            'soft_skills': self.format_skills_list(cv.soft_skills),
+            'summary': cv.summary or '',
+        }
+        
+        # Inject data into template
+        html_content = template.format(**template_data)
+        
+        # Write to file
+        output_path = f"{dest_dir}/cv.html"
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(html_content)
+        
+        return html_content
 
-            body {{
-                font-family: Arial, sans-serif;
-                max-width: 800px;
-                margin: auto;
-                padding: 20px;
-                line-height: 1.2;
-                color: #333;
-                background-color: white;
-                font-size: 12px;
-            }}
-
-            .header {{
-                text-align: center;
-                margin-bottom: 15px;
-            }}
-
-            .name {{
-                font-size: 32px;
-                font-weight: bold;
-                color: #6B46C1;
-                margin-bottom: 5px;
-                letter-spacing: 1px;
-                margin-top: -20px;
-            }}
-
-            .contact-info {{
-                font-size: 11px;
-                color: #666;
-                margin-top: 8px;
-            }}
-
-            .contact-info a {{
-                color: #6B46C1;
-                text-decoration: none;
-            }}
-
-            .contact-info a:hover {{
-                text-decoration: underline;
-            }}
-
-            .section {{
-                margin-bottom: 15px;
-            }}
-
-            .section-title {{
-                font-size: 18px;
-                font-weight: bold;
-                color: #6B46C1;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                margin-bottom: 10px;
-                padding-bottom: 2px;
-                border-bottom: 1.5px solid #6B46C1;
-            }}
-
-            .experience-entry, .education-entry, .project-entry {{
-                margin-bottom: 10px;
-            }}
-
-            .entry-header {{
-                margin-bottom: 2px;
-                color: #333;
-                font-size: 12px;
-            }}
-
-            .summary-text {{
-                text-align: justify;
-                margin-bottom: 0;
-                font-size: 11px;
-                line-height: 1.3;
-            }}
-
-            .skills-content {{
-                font-size: 11px;
-                line-height: 1.4;
-            }}
-
-            p {{
-                margin: 3px 0;
-                font-size: 11px;
-                text-align: justify;
-                line-height: 1.3;
-            }}
-
-            .two-column {{
-                display: flex;
-                gap: 25px;
-                margin-bottom: 15px;
-            }}
-
-            .column {{
-                flex: 1;
-            }}
-
-            @media (max-width: 600px) {{
-                .two-column {{
-                    flex-direction: column;
-                    gap: 20px;
-                }}
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <div class="name">{cv.personality.name or ''} {cv.personality.surname or ''}</div>
-            <div class="contact-info">
-                {format_contact_info(cv)}
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">Summary</div>
-            <p class="summary-text">{cv.summary or ''}</p>
-        </div>
-
-        <div class="section">
-            <div class="section-title">Work Experience</div>
-            {"".join(format_experience(exp) for exp in cv.experiences or [])}
-        </div>
-
-        <div class="section">
-            <div class="section-title">Projects</div>
-            {"".join(format_projects(proj) for proj in cv.projects or [])}
-        </div>
-
-        <div class="section">
-            <div class="section-title">Education</div>
-            {"".join(format_education(edu) for edu in cv.education or [])}
-        </div>
-
-        <div class="two-column">
-            <div class="column">
-                <div class="section">
-                    <div class="section-title">Hard Skills</div>
-                    <div class="skills-content">{format_skills_list(cv.hard_skills or [])}</div>
-                </div>
-            </div>
-
-            <div class="column">
-                <div class="section">
-                    <div class="section-title">Soft Skills</div>
-                    <div class="skills-content">{format_skills_list(cv.soft_skills or [])}</div>
-                </div>
-            </div>
-        </div>
-
-    </body>
-    </html>
-    """
-
-    with open(f"{dest_dir}/cv.html", "w", encoding="utf-8") as f:
-        f.write(html_template)
-
-    return html_template
+    def get_available_templates(self):
+        """Get list of available template names"""
+        return ['modern', 'classic', 'minimalist']
 
 
 def render_editable_cv(final_cv):
-    st.markdown("## 🧠 Final CV Editor")
+    # Ensure session lists are initialized
+    if "exps" not in st.session_state:
+        st.session_state.exps = final_cv.experiences or []
+    if "projs" not in st.session_state:
+        st.session_state.projs = final_cv.projects or []
+    if "edus" not in st.session_state:
+        st.session_state.edus = final_cv.education or []
+
+    # Callback to add new empty entry
+    def add_entry(entry_type):
+        if entry_type == "exp":
+            st.session_state.exps.append(type(final_cv.experiences[0])())  # or empty dataclass
+        elif entry_type == "proj":
+            st.session_state.projs.append(type(final_cv.projects[0])())
+        else:
+            st.session_state.edus.append(type(final_cv.education[0])())
+
+    # Callback to delete entry at index
+    def delete_entry(entry_type, idx):
+        if entry_type == "exp":
+            st.session_state.exps.pop(idx)
+        elif entry_type == "proj":
+            st.session_state.projs.pop(idx)
+        else:
+            st.session_state.edus.pop(idx)
+
 
     with st.expander("🧍‍♂️ Personality"):
         final_cv.personality.name = st.text_input("Name", value=final_cv.personality.name or "")
         final_cv.personality.surname = st.text_input("Surname", value=final_cv.personality.surname or "")
+        final_cv.job_title = st.text_input("Job Title", value=final_cv.job_title or "")
         final_cv.personality.e_mail = st.text_input("Email", value=final_cv.personality.e_mail or "")
         final_cv.personality.telephone = st.text_input("Telephone", value=final_cv.personality.telephone or "")
         final_cv.personality.linkedin_link = st.text_input("LinkedIn", value=final_cv.personality.linkedin_link or "")
@@ -257,34 +176,44 @@ def render_editable_cv(final_cv):
         final_cv.summary = st.text_area("Summary", value=final_cv.summary or "", height=100)
 
     with st.expander("💼 Work Experience"):
-        for i, exp in enumerate(final_cv.experiences or []):
+        for i, exp in enumerate(st.session_state.exps):
             with st.container():
-                st.markdown(f"#### Experience #{i+1}")
-                exp.title = st.text_input(f"Title #{i+1}", value=exp.title or "", key=f"title_{i}")
-                exp.company = st.text_input(f"Company #{i+1}", value=exp.company or "", key=f"company_{i}")
-                exp.start_date = st.text_input(f"Start Date #{i+1}", value=exp.start_date or "", key=f"start_{i}")
-                exp.end_date = st.text_input(f"End Date #{i+1}", value=exp.end_date or "", key=f"end_{i}")
-                exp.description = st.text_area(f"Description #{i+1}", value=exp.description or "", key=f"desc_{i}")
+                st.markdown(f"**Experience #{i+1}**")
+                exp.title = st.text_input("Title", exp.title or "", key=f"exp_title_{i}")
+                exp.company = st.text_input("Company", exp.company or "", key=f"exp_company_{i}")
+                exp.start_date = st.text_input("Start Date", exp.start_date or "", key=f"exp_start_{i}")
+                exp.end_date = st.text_input("End Date", exp.end_date or "", key=f"exp_end_{i}")
+                exp.description = st.text_area("Description", exp.description or "", key=f"exp_desc_{i}")
+                st.button("❌ Remove Experience", key=f"del_exp_{i}", on_click=delete_entry, args=("exp", i))
+                st.markdown("---")  # Horizontal line separator
+        
+        st.button("➕ Add Experience", on_click=add_entry, args=("exp",), key="add_exp_btn")
 
     with st.expander("🛠️ Projects"):
-        for i, proj in enumerate(final_cv.projects or []):
+        for i, proj in enumerate(st.session_state.projs):
             with st.container():
-                st.markdown(f"#### Project #{i+1}")
-                proj.title = st.text_input(f"Title #{i+1}", value=proj.title or "", key=f"proj_title_{i}")
-                proj.company = st.text_input(f"Company #{i+1}", value=proj.company or "", key=f"proj_company_{i}")
-                proj.start_date = st.text_input(f"Start Date #{i+1}", value=proj.start_date or "", key=f"proj_start_{i}")
-                proj.end_date = st.text_input(f"End Date #{i+1}", value=proj.end_date or "", key=f"proj_end_{i}")
-                proj.description = st.text_area(f"Description #{i+1}", value=proj.description or "", key=f"proj_desc_{i}")
+                st.markdown(f"**Project #{i+1}**")
+                proj.title = st.text_input("Title", proj.title or "", key=f"proj_title_{i}")
+                proj.company = st.text_input("Company", proj.company or "", key=f"proj_company_{i}")
+                proj.start_date = st.text_input("Start Date", proj.start_date or "", key=f"proj_start_{i}")
+                proj.end_date = st.text_input("End Date", proj.end_date or "", key=f"proj_end_{i}")
+                proj.description = st.text_area("Description", proj.description or "", key=f"proj_desc_{i}")
+                st.button("❌ Remove Project", key=f"del_proj_{i}", on_click=delete_entry, args=("proj", i))
+                st.markdown("---")
+        st.button("➕ Add Project", on_click=add_entry, args=("proj",))
 
     with st.expander("🎓 Education"):
-        for i, edu in enumerate(final_cv.education or []):
+        for i, edu in enumerate(st.session_state.edus):
             with st.container():
-                st.markdown(f"#### Education #{i+1}")
-                edu.title = st.text_input(f"Title #{i+1}", value=edu.title or "", key=f"edu_title_{i}")
-                edu.school_name = st.text_input(f"School #{i+1}", value=edu.school_name or "", key=f"edu_school_{i}")
-                edu.start_date = st.text_input(f"Start Date #{i+1}", value=edu.start_date or "", key=f"edu_start_{i}")
-                edu.end_date = st.text_input(f"End Date #{i+1}", value=edu.end_date or "", key=f"edu_end_{i}")
-                edu.description = st.text_area(f"Description #{i+1}", value=edu.description or "", key=f"edu_desc_{i}")
+                st.markdown(f"**Experience #{i+1}**")
+                edu.title = st.text_input("Title", edu.title or "", key=f"edu_title_{i}")
+                edu.school_name = st.text_input("School", edu.school_name or "", key=f"edu_school_{i}")
+                edu.start_date = st.text_input("Start Date", edu.start_date or "", key=f"edu_start_{i}")
+                edu.end_date = st.text_input("End Date", edu.end_date or "", key=f"edu_end_{i}")
+                edu.description = st.text_area("Description", edu.description or "", key=f"edu_desc_{i}")
+                st.button("❌ Remove Education", key=f"del_edu_{i}", on_click=delete_entry, args=("edu", i))
+                st.markdown("---")
+        st.button("➕ Add Education", on_click=add_entry, args=("edu",))
 
     with st.expander("🧩 Skills"):
         hard_skills_input = st.text_area(
@@ -298,13 +227,26 @@ def render_editable_cv(final_cv):
             key="soft_skills_input"
         )
 
+
+    with st.expander("🧾 Template Selection", expanded=True):
+        template_options = {
+            "Template 1": "1",
+            "Template 2": "2",
+            "Template 3": "3"
+        }
+        selected_template_label = st.selectbox("Choose a template", list(template_options.keys()))
+        st.session_state.template_id = template_options[selected_template_label]
+
     if st.button("✅ Apply Modifications"):
         final_cv.hard_skills = [s.strip() for s in hard_skills_input.split(",") if s.strip()]
         final_cv.soft_skills = [s.strip() for s in soft_skills_input.split(",") if s.strip()]
 
         st.success("Changes applied. CV updated.")
         st.session_state.information_extractor.final_cv = final_cv
-        st.session_state.generated_html = st.session_state.information_extractor.build_final_cv(update_final_cv=True)
+        st.session_state.generated_html = st.session_state.information_extractor.build_final_cv(
+            update_final_cv=True,
+            template_id=st.session_state.template_id
+        )
 
     if st.button("📄 Generate PDF"):
         with st.spinner("Generating PDF..."):
@@ -333,3 +275,18 @@ def render_editable_cv(final_cv):
             st.components.v1.html(download_html, height=0)
         else:
             st.error("❌ Failed to generate PDF.")
+
+
+a4_style = """
+<div style="
+    width: 794px;
+    height: 1123px;
+    margin: 10px 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 -5px 10px rgba(0, 0, 0, 0.4), 0 5px 10px rgba(0, 0, 0, 0.4);
+    padding: 40px;
+    background-color: white;
+    overflow: hidden;
+">
+    {}
+</div>
+"""

@@ -4,8 +4,9 @@ import os
 import pickle
 import streamlit as st
 
+from streamlit.components.v1 import html
 from support.extractor import InformationExtractor
-from support.html_builder import render_editable_cv
+from support.html_builder import a4_style, render_editable_cv
 from support.load_models import load_openAI_model
 from support.manage_ingestion import process_file
 from support.settings import api_key_value, TESTING, dest_dir
@@ -37,7 +38,7 @@ with st.sidebar.expander("🔐 OpenAI API Key", expanded=True):
 if api_key:
     os.environ["OPENAI_API_KEY"] = api_key
 
-left_col, right_col = st.columns([1, 1], gap="large")
+left_col, right_col = st.columns([0.3, 0.7], gap="large")
 with left_col:
     if uploaded_file:
         if "structured_cv" not in st.session_state:
@@ -64,7 +65,7 @@ with left_col:
 
     if "final_cv" in st.session_state:
         render_editable_cv(st.session_state.final_cv)
-
+        
     if st.session_state.get("generate_cv_trigger"):
         st.session_state.generate_cv_trigger = False  # Reset trigger
         if not api_key or not os.path.exists(f"{dest_dir}/user_curriculum.md") or not job_description:
@@ -96,6 +97,6 @@ with left_col:
                     st.error(f"Failed to process the CV with the model: {e}")
 
 with right_col:
-    if "final_cv_content" in st.session_state:
-        if "generated_html" in st.session_state:
-            st.html(st.session_state.generated_html)
+    if "final_cv_content" in st.session_state and "generated_html" in st.session_state:
+        html(a4_style.format(st.session_state.generated_html), height=1300, scrolling=True)
+
