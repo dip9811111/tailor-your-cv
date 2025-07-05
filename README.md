@@ -1,6 +1,7 @@
 
+https://github.com/user-attachments/assets/936e9e01-feac-46d6-963e-e042ca9cab42
 
-https://github.com/user-attachments/assets/e023e563-8e6b-4cd4-8958-7df612605c4a
+
 
 # 🎯 tailor-your-CV: AI-Powered Job-Tailored Resume Generator
 
@@ -23,7 +24,9 @@ tailor-your-CV is a powerful tool that helps users craft customized, high-impact
 
 - 🧠 **AI-Powered Tailoring**: Paste a job description and automatically generate a resume tailored to match it, using GPT-4.1's advanced understanding of language and relevance.
 
-- 🎨 **Template-Based Output**: Resumes are created using an html template that is then converted to PDF.
+- 🎨 **Template-Based Output**: Resumes are created using an HTML template and converted to PDF. You can choose from multiple professionally designed templates to match your style and industry.
+  
+- ✏️ **Live Editing & Preview**: You can now **modify the AI-generated resume**—add, edit, or remove any section—and **see a live preview** before downloading the final PDF.
 
 
 ## 🧩 How It Works
