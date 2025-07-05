@@ -110,7 +110,7 @@ class CVBuilder:
         template_data = {
             'name': cv.personality.name or '',
             'surname': cv.personality.surname or '',
-            'job_title': cv.job_title,
+            'job_title': cv.job_title or '',
             'experiences': ''.join(self.format_experience(exp) for exp in cv.experiences or []),
             'education': ''.join(self.format_education(edu) for edu in cv.education or []),
             'projects': ''.join(self.format_projects(proj) for proj in cv.projects or []),
@@ -232,7 +232,7 @@ def render_editable_cv(final_cv):
         template_options = {
             "Template 1": "1",
             "Template 2": "2",
-            "Template 3": "3"
+            # Add new templates
         }
         selected_template_label = st.selectbox("Choose a template", list(template_options.keys()))
         st.session_state.template_id = template_options[selected_template_label]

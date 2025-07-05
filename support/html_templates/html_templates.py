@@ -128,7 +128,7 @@ class CVTemplates:
                     </div>
 
                     <div class="section-block">
-                        <h2>SELECTED PROJECTS</h2>
+                        <h2>MY PROJECTS</h2>
                         {projects}
                     </div>
 
@@ -301,7 +301,7 @@ class CVTemplates:
             </div>
 
             <div class="section">
-                <div class="section-title">Projects</div>
+                <div class="section-title">My Projects</div>
                 {projects}
             </div>
 
