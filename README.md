@@ -43,6 +43,8 @@ tailor-your-CV is a powerful tool that helps users craft customized, high-impact
 ## 🪜 Steps to Use
 
 1. **Install requirements**
+    - Either with `pip install -r requirements`
+    - Or with `uv sync`
 2. **Run** `streamlit run app.py`
 3. **Set up your OpenAI API key** (copy-paste it into the app, or create a `config.ini` file with an `[OPENAI]` section and `API_KEY` variable).
 4. **Upload your base resume** (supported formats: `.pdf`, `.txt`, `.docx`, `.md`).
