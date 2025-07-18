@@ -1,3 +1,4 @@
+langchain-google-genai==2.1.8
 langchain_openai==0.3.18
 markitdown[all]==0.1.2
 pydantic==2.11.5

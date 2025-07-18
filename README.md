@@ -5,7 +5,7 @@ https://github.com/user-attachments/assets/936e9e01-feac-46d6-963e-e042ca9cab42
 
 # 🎯 tailor-your-CV: AI-Powered Job-Tailored Resume Generator
 
-tailor-your-CV is a powerful tool that helps users craft customized, high-impact resumes based on job descriptions using OpenAI GPT-4.1. Simply upload your professional experience, paste a job description, and let the LLM generate a tailored curriculum vitae aligned with your target role — all based on your chosen template.
+tailor-your-CV is a powerful tool that helps users craft customized, high-impact resumes based on job descriptions using either Google Gemini 2.5 Flash or OpenAI GPT-4.1. Simply upload your professional experience, paste a job description, and let the LLM generate a tailored curriculum vitae aligned with your target role — all based on your chosen template.
 
 ## 🚀 Features
 
@@ -46,13 +46,15 @@ tailor-your-CV is a powerful tool that helps users craft customized, high-impact
     - Either with `pip install -r requirements`
     - Or with `uv sync`
 2. **Run** `streamlit run app.py`
-3. **Set up your OpenAI API key** (copy-paste it into the app, or create a `config.ini` file with an `[OPENAI]` section and `API_KEY` variable).
+3. **Set up your OpenAI or Gemini API keys** (copy-paste it into the app, or create a `config.ini` file with an `[OPENAI]` or `[GEMINI]` section and `API_KEY` variable).
+    - Note: if both Gemini and OpenAI API keys are proived, **Gemini** takes precedence since it's free to call.
 4. **Upload your base resume** (supported formats: `.pdf`, `.txt`, `.docx`, `.md`).
 5. **Paste the target job description** into the provided input field.
 6. **Generate your tailored resume** — the output is a professional PDF, optimized for the job and ready to send.
 
 ## 🛠️ Tech Stack
 
+- **Gemini-2.5-Flash** via Google Gemini free API – for free content generation and tailoring
 - **GPT-4.1** via OpenAI API – for content generation and tailoring
 - **MarkItDown** – to convert user files to structured Markdown
 - **Streamlit** for the UI
