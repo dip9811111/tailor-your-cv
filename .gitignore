@@ -14,3 +14,4 @@ output
 !test/*.pdf
 !test/*.md
 !test/*.html
+*.db

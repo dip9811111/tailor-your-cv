@@ -152,6 +152,17 @@ class NewCurriculum(BaseModel):
     )
 
 
+class JobDescriptionInformation(BaseModel):
+    job_title: Optional[str] = Field(
+        default=None,
+        description="The advertised job title or role, such as 'Software Engineer' or 'Marketing Manager'."
+    )
+    company_name: Optional[str] = Field(
+        default=None,
+        description="The name of the company offering the position, as stated in the job description."
+    )
+
+
 class FinalCurriculum:
     def __init__(self, personality, job_title, summary, experiences, projects, education, hard_skills, soft_skills):
         self.personality = personality

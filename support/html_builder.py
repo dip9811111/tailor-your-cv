@@ -3,8 +3,8 @@ import os
 import streamlit as st
 
 from string import Formatter
-from support.settings import dest_dir
 from support.html_templates.html_templates import CVTemplates
+from support.submission_manager import get_pdf_by_id
 
 
 class CVBuilder:
@@ -251,6 +251,7 @@ def render_editable_cv(final_cv):
     if st.button("📄 Generate PDF"):
         with st.spinner("Generating PDF..."):
             st.session_state.information_extractor.create_pdf()
+            
 
         pdf_path = st.session_state.information_extractor.generated_pdf_path
         if os.path.exists(pdf_path):
@@ -290,3 +291,82 @@ a4_style = """
     {}
 </div>
 """
+
+def render_submissions_html(submissions):
+    # Start HTML
+    html = """
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: 'Segoe UI', sans-serif;
+            padding: 0;
+            margin: 0;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          }
+          thead {
+            background-color: #f3f4f6;
+            font-weight: bold;
+            text-align: left;
+          }
+          th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+          }
+          tr:hover {
+            background-color: #f9fafb;
+          }
+          .download-btn {
+            display: inline-block;
+            background-color: #2563eb;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+          }
+          .download-btn:hover {
+            background-color: #1e40af;
+          }
+        </style>
+      </head>
+      <body>
+        <table>
+          <thead>
+            <tr>
+              <th>🏢 Company</th>
+              <th>💼 Job Title</th>
+              <th>📅 Generation Date</th>
+              <th>⬇️ Download</th>
+            </tr>
+          </thead>
+          <tbody>
+    """
+
+    for id_, company, pos, date in submissions:
+        date_str = date.split("T")[0]
+        pdf_bytes = get_pdf_by_id(id_)
+        b64 = base64.b64encode(pdf_bytes).decode()
+        link = f'data:application/pdf;base64,{b64}'
+        html += f"""
+            <tr>
+              <td>{company}</td>
+              <td>{pos}</td>
+              <td>{date_str}</td>
+              <td><a class="download-btn" href="{link}" download="{company}_{pos}.pdf">Download</a></td>
+            </tr>
+        """
+
+    html += """
+          </tbody>
+        </table>
+      </body>
+    </html>
+    """
+    return html

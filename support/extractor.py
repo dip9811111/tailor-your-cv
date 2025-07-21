@@ -1,11 +1,11 @@
-import os
 import pickle
 import weasyprint
 
 from support.html_builder import CVBuilder
 from support.settings import dest_dir
-from support.supportClasses import Curriculum, NewCurriculum, FinalCurriculum
-from support.supportLLM import system_prompt_data_extraction, system_prompt_curriculum_creation
+from support.supportClasses import Curriculum, FinalCurriculum, NewCurriculum, JobDescriptionInformation
+from support.supportLLM import system_prompt_data_extraction, system_prompt_curriculum_creation, system_prompt_jd_extraction
+from support.submission_manager import save_submission
 
 
 class InformationExtractor:
@@ -13,6 +13,7 @@ class InformationExtractor:
 
         self.system_prompt_data_extraction = system_prompt_data_extraction
         self.system_prompt_curriculum_creation = system_prompt_curriculum_creation
+        self.system_prompt_jd_extraction = system_prompt_jd_extraction
         self.MODEL = None
         self.structured_cv = None
         self.new_cv = None
@@ -21,6 +22,7 @@ class InformationExtractor:
         self.new_cv_path = f"{dest_dir}/new_cv.pkl"
         self.generated_html = None
         self.final_cv = None
+        self.jd_information = None
 
     def extract_data(self, markdown_cv: str = None, is_new_cv=False):
         """
@@ -64,16 +66,16 @@ class InformationExtractor:
         """
 
         user_message = f"""
-                This is my portfolio:
+            This is my portfolio:
 
-                [START PORTFOLIO]
-                {structured_curriculum}
-                [END PORTFOLIO]
+            [START PORTFOLIO]
+            {structured_curriculum}
+            [END PORTFOLIO]
 
-                [JOB DESCRIPTION]
-                {job_description}
-                [END JOB DESCRIPTION]
-                """
+            [JOB DESCRIPTION]
+            {job_description}
+            [END JOB DESCRIPTION]
+        """
 
         messages = [
             {"role": "system", "content": self.system_prompt_curriculum_creation},
@@ -90,6 +92,27 @@ class InformationExtractor:
         
         with open(self.new_cv_path, 'wb') as f:
             pickle.dump(new_structured_cv, f)
+
+
+        user_message = f"""
+            This is the Job Description:
+            [JOB DESCRIPTION]
+            {job_description}
+            [END JOB DESCRIPTION]
+        """
+
+        messages = [
+            {"role": "system", "content": self.system_prompt_jd_extraction},
+            {"role": "user", "content": user_message},
+        ]
+
+        structured_llm = self.MODEL.with_structured_output(
+            JobDescriptionInformation,
+            method="function_calling"
+        )
+
+        jd_information = structured_llm.invoke(messages)
+        self.jd_information = jd_information
 
         return new_structured_cv
 
@@ -124,3 +147,6 @@ class InformationExtractor:
 
     def create_pdf(self):
         weasyprint.HTML(string=self.generated_html).write_pdf(self.generated_pdf_path)
+        
+        jd_information = self.jd_information
+        save_submission(jd_information.company_name, jd_information.job_title, self.generated_pdf_path)
