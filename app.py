@@ -1,15 +1,17 @@
-
-import json
 import os
 import pickle
 import streamlit as st
 
 from streamlit.components.v1 import html
 from support.extractor import InformationExtractor
-from support.html_builder import a4_style, render_editable_cv
+from support.html_builder import a4_style, render_editable_cv, render_submissions_html
 from support.load_models import load_openAI_model, load_gemini_model
 from support.manage_ingestion import process_file
 from support.settings import dest_dir, gemini_api_key_value, openai_api_key_value, TESTING
+from support.submission_manager import initialize_db, get_all_submissions
+
+
+initialize_db()
 
 
 st.set_page_config(layout="wide")
@@ -34,7 +36,7 @@ with st.sidebar.expander("🔐 Models & Info", expanded=True):
     job_description = st.text_area("Paste the job description here")
     if st.button("🪄 Generate my new CV"):
         st.session_state.generate_cv_trigger = True
-        st.components.v1.html(auto_click_html, height=0)
+        html(auto_click_html, height=0)
 
 if openai_api_key:
     os.environ["OPENAI_API_KEY"] = openai_api_key
@@ -92,8 +94,7 @@ with left_col:
                         with open(st.session_state.information_extractor.new_cv_path, 'rb') as file:
                             new_cv = pickle.load(file)
                         st.session_state.information_extractor.new_cv = new_cv
-                    
-                    response_json = new_cv.model_dump()
+
                     generated_html = st.session_state.information_extractor.build_final_cv()
                     st.session_state.final_cv = st.session_state.information_extractor.final_cv
                     render_editable_cv(st.session_state.information_extractor.final_cv)
@@ -106,3 +107,17 @@ with right_col:
     if "final_cv_content" in st.session_state and "generated_html" in st.session_state:
         html(a4_style.format(st.session_state.generated_html), height=1300, scrolling=True)
 
+with st.sidebar.expander("📁 See my submissions"):
+    if st.button("📄 View Submissions"):
+        st.session_state.view_submissions = True
+
+
+if st.session_state.get("view_submissions"):
+    st.subheader("📬 My Applications")
+    submissions = get_all_submissions()
+
+    if not submissions:
+        st.info("No applications yet.")
+    else:
+        html_content = render_submissions_html(submissions)
+        html(html_content, height=400, scrolling=True)
