@@ -15,16 +15,14 @@ def load_openAI_model():
 
     return MODEL
 
+
 def load_gemini_model():
     MODEL = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash",
+        model="gemini-2.5-pro",
         temperature=0,
         top_p=0,
-        max_tokens=None,
         timeout=None,
         max_retries=1,
-        seed=42,
     )
 
     return MODEL
-
