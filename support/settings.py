@@ -4,7 +4,7 @@ import os
 # When set to True, the application will use provided test files and enable a "testing environment".
 # Set to False for "production" use.
 
-TESTING = False
+TESTING = True
 if TESTING:
     openai_api_key_value = "fake-api-key"
     gemini_api_key_value = "fake-api-key"
@@ -23,4 +23,3 @@ else:
 
 if not os.path.exists(dest_dir):
     os.makedirs(dest_dir)
-

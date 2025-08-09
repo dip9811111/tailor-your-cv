@@ -3,13 +3,14 @@ import os
 import streamlit as st
 
 from string import Formatter
-from support.html_templates.html_templates import CVTemplates
+from support.html_templates.html_templates import CVTemplates, CoverLetterTemplates
 from support.submission_manager import get_pdf_by_id
+from typing import Optional
 
 
 class CVBuilder:
     """Main CV builder class that handles template injection"""
-    
+
     def __init__(self):
         self.templates = CVTemplates()
 
@@ -18,7 +19,7 @@ class CVBuilder:
         formatter = Formatter()
         placeholders = [field_name for _, field_name, _, _ in formatter.parse(template_string) if field_name]
         return set(placeholders)
-    
+
     def convert_date(self, element):
         """Convert date elements to formatted string"""
         date_string = ""
@@ -92,20 +93,20 @@ class CVBuilder:
     def build_html_from_cv(self, cv, template_id="1", dest_dir="./"):
         """
         Build HTML from CV data using specified template
-        
+
         Args:
             cv: CV data object
             template_id: ID of template to use ('1', '2', '3')
             dest_dir: Destination directory for output
         """
-        
+
         # Get the template
         template_method = getattr(self.templates, f"template_{template_id}", None)
         if not template_method:
             raise ValueError(f"Template '{template_id}' not found. Available: modern, classic, minimalist")
-        
+
         template = template_method()
-        
+
         # Prepare data for injection
         template_data = {
             'name': cv.personality.name or '',
@@ -119,20 +120,102 @@ class CVBuilder:
             'soft_skills': self.format_skills_list(cv.soft_skills),
             'summary': cv.summary or '',
         }
-        
+
         # Inject data into template
         html_content = template.format(**template_data)
-        
+
         # Write to file
         output_path = f"{dest_dir}/cv.html"
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(html_content)
-        
+
         return html_content
 
     def get_available_templates(self):
         """Get list of available template names"""
         return ['modern', 'classic', 'minimalist']
+
+
+class CoverLetterBuilder:
+    """Main Cover Letter builder class that handles template injection"""
+
+    def __init__(self):
+        self.templates = CoverLetterTemplates()
+
+    def format_contact_info(self, cover_letter):
+        """Format contact information"""
+        contact_parts = {}
+
+        contact_parts['email'] = f"{cover_letter.email} |" or ''
+        contact_parts['phone'] = f"{cover_letter.phone} |" or ''
+        contact_parts['linkedin'] = f'<a href="{cover_letter.linkedin}">{cover_letter.linkedin} |</a>' if cover_letter.linkedin else ''
+        contact_parts['github'] = f'<a href="{cover_letter.github}">{cover_letter.github} |</a>' if cover_letter.github else ''
+
+        return contact_parts
+
+    def format_body_content(self, paragraphs):
+        """Format body content paragraphs"""
+        if not paragraphs:
+            return ""
+
+        formatted_paragraphs = []
+        for paragraph in paragraphs:
+            if paragraph.strip():
+                formatted_paragraphs.append(f"<p>{paragraph.strip()}</p>")
+
+        return "\n".join(formatted_paragraphs)
+
+    def build_html_from_cover_letter(self, cover_letter, template_id="1", dest_dir="./"):
+        """
+        Build HTML from Cover Letter data using specified template
+
+        Args:
+            cover_letter: Cover Letter data object
+            template_id: ID of template to use ('1', '2', '3')
+            dest_dir: Destination directory for output
+        """
+
+        # Get the template
+        template_method = getattr(self.templates, f"template_{template_id}", None)
+        if not template_method:
+            raise ValueError(f"Template '{template_id}' not found.")
+
+        template = template_method()
+
+        # Format contact info
+        contact_info = self.format_contact_info(cover_letter)
+
+        # Prepare data for injection
+        template_data = {
+            'name': cover_letter.name or '',
+            'surname': cover_letter.surname or '',
+            'current_position': cover_letter.current_position or '',
+            'email': contact_info['email'],
+            'phone': contact_info['phone'],
+            'linkedin': contact_info['linkedin'],
+            'github': contact_info['github'],
+            'date': cover_letter.date,
+            # 'company_name': cover_letter.company_name or '',
+            # 'company_address': cover_letter.company_address or '',
+            'position_title': cover_letter.position_title or '',
+            'salutation': cover_letter.salutation or 'Dear Hiring Manager,',
+            'body_content': self.format_body_content(cover_letter.body_paragraphs or []),
+            'closing': cover_letter.closing or 'Thank you for considering my application. I look forward to hearing from you.',
+        }
+
+        # Inject data into template
+        html_content = template.format(**template_data)
+
+        # Write to file
+        output_path = f"{dest_dir}/cover_letter.html"
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(html_content)
+
+        return html_content
+
+    def get_available_templates(self):
+        """Get list of available template names"""
+        return ['professional', 'modern', 'classic']
 
 
 def render_editable_cv(final_cv):
@@ -162,6 +245,68 @@ def render_editable_cv(final_cv):
         else:
             st.session_state.edus.pop(idx)
 
+    def create_pdf_download_link(pdf_bytes: bytes, filename: str) -> str:
+        """Create a data URI for PDF download."""
+        b64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
+        return f'data:application/pdf;base64,{b64_pdf}'
+
+    def create_auto_download_html(href: str, filename: str) -> str:
+        """Generate HTML that triggers automatic download."""
+        return f"""
+        <html>
+        <body>
+            <a id="autoDownload" href="{href}" download="{filename}"></a>
+            <script>
+                document.getElementById('autoDownload').click();
+            </script>
+        </body>
+        </html>
+        """
+
+    def read_pdf_file(file_path: str) -> Optional[bytes]:
+        """Safely read PDF file and return bytes, or None if file doesn't exist."""
+        if not os.path.exists(file_path):
+            return None
+
+        try:
+            with open(file_path, "rb") as f:
+                return f.read()
+        except (IOError, OSError) as e:
+            st.error(f"Error reading file {file_path}: {e}")
+            return None
+
+    def trigger_pdf_downloads():
+        """Main function to handle PDF downloads."""
+        # Get file paths from session state
+        cv_path = st.session_state.information_extractor.generated_pdf_path
+        cover_letter_path = st.session_state.information_extractor.generated_cover_letter_pdf_path
+
+        # Define download configurations
+        downloads = [
+            {"path": cv_path, "filename": "CV.pdf"},
+            {"path": cover_letter_path, "filename": "Cover_Letter.pdf"}
+        ]
+
+        # Read and validate all files first
+        pdf_data = []
+        for config in downloads:
+            pdf_bytes = read_pdf_file(config["path"])
+            if pdf_bytes is None:
+                st.error("❌ Failed to generate PDF.")
+                return
+
+            pdf_data.append({
+                "bytes": pdf_bytes,
+                "filename": config["filename"]
+            })
+
+        # All files exist, proceed with downloads
+        st.success("✅ PDFs generated. Download should start automatically.")
+
+        for data in pdf_data:
+            href = create_pdf_download_link(data["bytes"], data["filename"])
+            download_html = create_auto_download_html(href, data["filename"])
+            st.components.v1.html(download_html, height=0)
 
     with st.expander("🧍‍♂️ Personality"):
         final_cv.personality.name = st.text_input("Name", value=final_cv.personality.name or "")
@@ -186,7 +331,7 @@ def render_editable_cv(final_cv):
                 exp.description = st.text_area("Description", exp.description or "", key=f"exp_desc_{i}")
                 st.button("❌ Remove Experience", key=f"del_exp_{i}", on_click=delete_entry, args=("exp", i))
                 st.markdown("---")  # Horizontal line separator
-        
+
         st.button("➕ Add Experience", on_click=add_entry, args=("exp",), key="add_exp_btn")
 
     with st.expander("🛠️ Projects"):
@@ -227,7 +372,6 @@ def render_editable_cv(final_cv):
             key="soft_skills_input"
         )
 
-
     with st.expander("🧾 Template Selection", expanded=True):
         template_options = {
             "Template 1": "1",
@@ -251,31 +395,8 @@ def render_editable_cv(final_cv):
     if st.button("📄 Generate PDF"):
         with st.spinner("Generating PDF..."):
             st.session_state.information_extractor.create_pdf()
-            
 
-        pdf_path = st.session_state.information_extractor.generated_pdf_path
-        if os.path.exists(pdf_path):
-            with open(pdf_path, "rb") as f:
-                pdf_bytes = f.read()
-
-            # Encode PDF to base64
-            b64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
-            href = f'data:application/pdf;base64,{b64_pdf}'
-
-            download_html = f"""
-            <html>
-            <body>
-                <a id="autoDownload" href="{href}" download="my_new_cv.pdf"></a>
-                <script>
-                    document.getElementById('autoDownload').click();
-                </script>
-            </body>
-            </html>
-            """
-            st.success("✅ PDF generated. Download should start automatically.")
-            st.components.v1.html(download_html, height=0)
-        else:
-            st.error("❌ Failed to generate PDF.")
+        trigger_pdf_downloads()
 
 
 a4_style = """
@@ -291,6 +412,7 @@ a4_style = """
     {}
 </div>
 """
+
 
 def render_submissions_html(submissions):
     # Start HTML
@@ -343,7 +465,7 @@ def render_submissions_html(submissions):
               <th>🏢 Company</th>
               <th>💼 Job Title</th>
               <th>📅 Generation Date</th>
-              <th>⬇️ Download</th>
+              <th>⬇️ Download documents</th>
             </tr>
           </thead>
           <tbody>
@@ -351,15 +473,20 @@ def render_submissions_html(submissions):
 
     for id_, company, pos, date in submissions:
         date_str = date.split("T")[0]
-        pdf_bytes = get_pdf_by_id(id_)
-        b64 = base64.b64encode(pdf_bytes).decode()
-        link = f'data:application/pdf;base64,{b64}'
+        cv_pdf_bytes, cover_letter_pdf_bytes = get_pdf_by_id(id_)
+        cv_b64 = base64.b64encode(cv_pdf_bytes).decode()
+        cover_letter_b64 = base64.b64encode(cover_letter_pdf_bytes).decode()
+        cv_link = f'data:application/pdf;base64,{cv_b64}'
+        cover_letter_link = f'data:application/pdf;base64,{cover_letter_b64}'
         html += f"""
             <tr>
               <td>{company}</td>
               <td>{pos}</td>
               <td>{date_str}</td>
-              <td><a class="download-btn" href="{link}" download="{company}_{pos}.pdf">Download</a></td>
+              <td>
+                <a class="download-btn" href="{cv_link}" download="{company}_{pos}.pdf">Download CV</a>
+                <a class="download-btn" href="{cover_letter_link}" download="{company}_{pos}.pdf">Download cover letter</a>
+              </td>
             </tr>
         """
 

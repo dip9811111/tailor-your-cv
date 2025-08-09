@@ -119,16 +119,34 @@ with left_col:
                             structured_curriculum=st.session_state.information_extractor.structured_cv,
                             job_description=job_description,
                         )
+                        cover_letter = st.session_state.information_extractor.create_new_cover_letter(
+                            structured_curriculum=st.session_state.information_extractor.structured_cv,
+                            job_description=job_description,
+                        )
                     else:
                         with open(
                             st.session_state.information_extractor.new_cv_path, "rb"
                         ) as file:
                             new_cv = pickle.load(file)
+
+                        with open(
+                            st.session_state.information_extractor.cover_letter_path, "rb"
+                        ) as file:
+                            cover_letter = pickle.load(file)
+
+                        with open(
+                            st.session_state.information_extractor.jd_information_path, "rb"
+                        ) as file:
+                            jd_information = pickle.load(file)
+
                         st.session_state.information_extractor.new_cv = new_cv
+                        st.session_state.information_extractor.cover_letter = cover_letter
+                        st.session_state.information_extractor.jd_information = jd_information
 
                     generated_html = (
                         st.session_state.information_extractor.build_final_cv()
                     )
+
                     st.session_state.final_cv = (
                         st.session_state.information_extractor.final_cv
                     )
@@ -137,6 +155,22 @@ with left_col:
                         st.session_state.information_extractor.final_cv
                     )
                     st.session_state.generated_html = generated_html
+
+                    # Cover Letter
+                    generated_html_cover_letter = (
+                        st.session_state.information_extractor.build_final_cover_letter()
+                    )
+
+                    st.session_state.final_cover_letter = (
+                        st.session_state.information_extractor.final_cover_letter
+                    )
+
+                    # render_editable_cv(st.session_state.information_extractor.final_cv)
+                    st.session_state.final_cover_letter_content = (
+                        st.session_state.information_extractor.final_cover_letter
+                    )
+                    st.session_state.generated_html_cover_letter = generated_html_cover_letter
+
                 except Exception as e:
                     st.error(f"Failed to process the CV with the model: {e}")
 
@@ -148,10 +182,16 @@ with right_col:
             scrolling=True,
         )
 
+    if "final_cover_letter_content" in st.session_state and "generated_html_cover_letter" in st.session_state:
+        html(
+            a4_style.format(st.session_state.generated_html_cover_letter),
+            height=1300,
+            scrolling=True,
+        )
+
 with st.sidebar.expander("📁 See my submissions"):
     if st.button("📄 View Submissions"):
         st.session_state.view_submissions = True
-
 
 if st.session_state.get("view_submissions"):
     st.subheader("📬 My Applications")
