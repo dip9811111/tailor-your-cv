@@ -23,4 +23,3 @@ else:
 
 if not os.path.exists(dest_dir):
     os.makedirs(dest_dir)
-

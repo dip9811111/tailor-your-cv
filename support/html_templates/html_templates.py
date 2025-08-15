@@ -330,5 +330,160 @@ class CVTemplates:
         </html>
         """
 
-    
-    
+
+class CoverLetterTemplates:
+    """Collection of HTML templates for Cover Letter generation"""
+
+    @staticmethod
+    def template_1():
+        return """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8" />
+            <style>
+                @page {{ size: A4; margin: 0.75in; }}
+                * {{ box-sizing: border-box; }}
+                body {{
+                    font-family: 'Calibri', 'Arial', sans-serif;
+                    font-size: 11pt;
+                    line-height: 1.5;
+                    margin: 0;
+                    padding: 0;
+                    color: #333;
+                    max-width: 8.5in;
+                    margin: 0 auto;
+                }}
+
+                .header {{
+                    text-align: center;
+                    margin-bottom: 2rem;
+                    border-bottom: 1px solid #ddd;
+                    padding-bottom: 1rem;
+                }}
+
+                .name {{
+                    font-size: 24pt;
+                    font-weight: bold;
+                    color: #2c3e50;
+                    margin-bottom: 0.3rem;
+                    letter-spacing: 0.5px;
+                }}
+
+                .job-title {{
+                    font-size: 14pt;
+                    color: #666;
+                    margin-bottom: 0.8rem;
+                    font-style: italic;
+                }}
+
+                .contact-info {{
+                    font-size: 10pt;
+                    color: #555;
+                    line-height: 1.3;
+                }}
+
+                .contact-info a {{
+                    color: #2980b9;
+                    text-decoration: none;
+                }}
+
+                .recipient {{
+                    margin-bottom: 1.5rem;
+                    font-size: 11pt;
+                }}
+
+                .recipient-name {{
+                    font-weight: bold;
+                    margin-bottom: 0.2rem;
+                }}
+
+                .recipient-details {{
+                    color: #666;
+                    line-height: 1.3;
+                }}
+
+                .date {{
+                    font-size: 10pt;
+                    color: #666;
+                }}
+
+                .subject {{
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    font-size: 18pt;
+                    color: #2c3e50;
+                    letter-spacing: 1px;
+                }}
+
+                .date-subject-line {{
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin: 2rem 0 1.5rem 0;
+                }}
+
+                .salutation {{
+                    margin-bottom: 1rem;
+                    font-size: 11pt;
+                }}
+
+                .body-content {{
+                    margin-bottom: 1.5rem;
+                    text-align: justify;
+                    font-size: 11pt;
+                    line-height: 1.6;
+                }}
+
+                .body-content p {{
+                    margin-bottom: 1rem;
+                    text-indent: 0;
+                }}
+
+                .closing {{
+                    margin-top: 2rem;
+                    margin-bottom: 1rem;
+                }}
+
+                .signature {{
+                    margin-top: 2rem;
+                    font-weight: bold;
+                    color: #2c3e50;
+                }}
+
+                .highlight {{
+                    background-color: #f8f9fa;
+                    padding: 0.1rem 0.3rem;
+                    border-radius: 3px;
+                }}
+
+                .skills-mention {{
+                    font-style: italic;
+                    color: #2980b9;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="name">{name} {surname}</div>
+                <div class="job-title">{current_position}</div>
+                <div class="contact-info"> {email} {phone} {linkedin} {github}</div>
+            </div>
+
+            <div class="date-subject-line">
+                <div class="subject">{position_title}</div>
+                <div class="date">{date}</div>
+            </div>
+
+            <div class="salutation">{salutation}</div>
+
+            <div class="body-content">
+                {body_content}
+            </div>
+
+            <div class="closing">{closing}</div>
+
+            <div class="signature">{name} {surname}</div>
+        </body>
+        </html>
+        """

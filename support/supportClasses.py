@@ -44,7 +44,7 @@ class EducationExperience(BaseModel):
     )
     end_date: Optional[str] = Field(
         default=None,
-        description="End_date date (or year) of this experience."
+        description="End date date (or year) of this experience."
     )
 
 
@@ -71,7 +71,7 @@ class NewExperience(BaseModel):
     )
     end_date: Optional[str] = Field(
         default=None,
-        description="End_date date (or year) of this experience."
+        description="End date date (or year) of this experience."
     )
 
 
@@ -99,6 +99,10 @@ class Personality(BaseModel):
     address: Optional[str] = Field(
         default=None,
         description="Physical or mailing address of the CV holder."
+    )
+    job_title: Optional[str] = Field(
+        default=None,
+        description="Current job title."
     )
 
 
@@ -163,6 +167,21 @@ class JobDescriptionInformation(BaseModel):
     )
 
 
+class CoverLetter(BaseModel):
+    salutation: Optional[str] = Field(
+        default=None,
+        description="The greeting line at the start of the cover letter, e.g., 'Dear Hiring Manager,' or 'Dear [Recipient Name],'."
+    )
+    body_paragraphs: Optional[List[str]] = Field(
+        default=None,
+        description="The main body of the cover letter, consisting of 2–4 paragraphs that outline your qualifications, experience, and interest in the role."
+    )
+    closing: Optional[str] = Field(
+        default=None,
+        description="The final closing statement of the letter, typically expressing gratitude and interest in further communication, e.g., 'Thank you for your time and consideration.'"
+    )
+
+
 class FinalCurriculum:
     def __init__(self, personality, job_title, summary, experiences, projects, education, hard_skills, soft_skills):
         self.personality = personality
@@ -173,3 +192,41 @@ class FinalCurriculum:
         self.education = education
         self.soft_skills = soft_skills
         self.hard_skills = hard_skills
+
+
+class FinalCoverLetter:
+    def __init__(
+        self,
+        name='',
+        surname='',
+        current_position='',
+        email='',
+        phone='',
+        linkedin='',
+        github='',
+        date='',
+        recipient_name='',
+        company_name='',
+        company_address='',
+        position_title='',
+        salutation='Dear Hiring Manager,',
+        body_paragraphs=None,
+        closing='Thank you for considering my application. I look forward to hearing from you.'
+    ):
+        self.name = name
+        self.surname = surname
+        self.current_position = current_position
+        self.email = email
+        self.phone = phone
+        self.linkedin = linkedin
+        self.github = github
+        self.date = date
+        self.recipient_name = recipient_name
+        self.company_name = company_name
+        self.company_address = company_address
+        self.position_title = position_title
+        self.salutation = salutation
+        self.body_paragraphs = body_paragraphs if body_paragraphs is not None else []
+        self.closing = closing
+
+        
