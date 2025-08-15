@@ -1,71 +1,140 @@
-https://github.com/user-attachments/assets/936e9e01-feac-46d6-963e-e042ca9cab42
+# 🚀 AI CV Builder
 
-# 🎯 tailor-your-CV: AI-Powered Job-Tailored Resume Generator
+Your smart assistant for creating, editing, and customizing professional CVs and cover letters using AI.
 
-tailor-your-CV is a powerful tool that helps users craft customized, high-impact resumes based on job descriptions using
-either Google Gemini 2.5 Pro or OpenAI GPT-4.1. Simply upload your professional experience, paste a job description,
-and let the LLM generate a tailored curriculum vitae aligned with your target role — all based on your chosen template.
+## ✨ Features
 
-## 🚀 Features
+- **AI-Powered CV Processing**: Upload your existing CV and let AI extract and structure your information
+- **Portfolio Management**: Maintain a persistent portfolio of your experiences, skills, and education
+- **Tailored Applications**: Generate job-specific CVs and cover letters based on job descriptions
+- **Multiple AI Models**: Support for both OpenAI GPT-4 and Google Gemini models
+- **Professional Templates**: Multiple CV and cover letter templates to choose from
+- **PDF Generation**: Download your documents as professional PDFs
+- **Application Tracking**: Keep track of all your job applications
 
-- 📁 **Experience Upload**: Upload a file containing:
-    - Work experience
-    - Additional personal or freelance projects
-    - Hard & soft skills
-    - Academic achievements
-    - Personal information (mail, phone, LinkedIn profile, etc.)
+## 🏗️ Architecture
 
-  > ✅ *Tip: A simple file format (like a plain `.txt` file) with all the details is preferred—avoid complex or heavily
-  structured formats.*
+The application is built with a modular, multi-page structure:
 
+### Core Pages
 
-- 🖋️ **Markdown Conversion**: Uses `MarkItDown` to convert your uploaded file to clean Markdown, which is then injected
-  into the LLM for optimized processing.
+1. **🏠 Home** (`home.py`) - Dashboard and navigation hub
+2. **⚙️ Manage Settings** (`pages/manage_settings.py`) - API key configuration and model selection
+3. **📁 Portfolio** (`pages/portfolio.py`) - CV upload, processing, and editing
+4. **📝 New Submission** (`pages/new_submission.py`) - Job-specific CV and cover letter generation
+5. **📬 My Submissions** (`pages/my_submissions.py`) - Application history and downloads
 
-- 🧠 **AI-Powered Tailoring**: Paste a job description and automatically generate a resume tailored to match it, using
-  Gemini 2.5 Pro or GPT-4.1's advanced understanding of language and relevance.
+### Support Modules
 
-- 🎨 **Template-Based Output**: Resumes are created using an HTML template and converted to PDF. You can choose from
-  multiple professionally designed templates to match your style and industry.
+- **`support/extractor.py`** - AI-powered data extraction and document generation
+- **`support/html_builder.py`** - HTML generation and editing interfaces
+- **`support/supportClasses.py`** - Data models and structures
+- **`support/html_templates/`** - CV and cover letter templates
+- **`support/submission_manager.py`** - Database operations for submissions
 
-- ✏️ **Live Editing & Preview**: You can now **modify the AI-generated resume**—add, edit, or remove any section—and *
-  *see a live preview** before downloading the final PDF.
+## 🚀 Getting Started
 
-## 🧩 How It Works
+### 1. Setup & Configuration
+- Navigate to "Manage Settings"
+- Configure your OpenAI or Gemini API key
+- Select your preferred AI model
 
-1. **Document Ingestion**: The user's resume or experience file is processed and converted into clean Markdown — a
-   structured, LLM-friendly format. Once completed, two files are generated: `structured_cv.pkl` (a serialized
-   structured representation) and `user_curriculum.md` (the Markdown version). These are cached for future use, so this
-   step can be skipped on subsequent runs unless the input document changes.
+### 2. Portfolio Creation
+- Go to "Portfolio" page
+- Upload your existing CV (PDF, TXT, DOCX, MD)
+- AI will extract and structure your information
+- Edit and refine your experiences, skills, and education
+- Save your portfolio for future use
 
-2. **Structured CV Generation**: Leveraging the structured output capabilities of modern LLMs, the system transforms the
-   Markdown content into a standardized format, referred to as the *structured CV*. This ensures consistency and clarity
-   in how experiences, skills, and achievements are represented.
+### 3. Job Application
+- Navigate to "New Submission"
+- Paste the job description
+- AI generates tailored CV and cover letter
+- Edit both documents to your preference
+- Download PDFs or save to database
 
-3. **AI-Powered Tailoring — With Boundaries**: The *structured CV* and the job description are provided to the LLM.
-   Using controlled prompts and structured output constraints, the model enhances and prioritizes relevant experiences
-   that align with the job requirements — without hallucinating or inventing content. The focus is on intelligent
-   rephrasing and emphasis, not fabrication.
+### 4. Track Applications
+- View all submissions in "My Submissions"
+- Download previous applications
+- Monitor your job search progress
 
-4. **HTML & PDF Generation**: The tailored content is dynamically injected into an HTML template, which is then rendered
-   and exported as a polished, ready-to-send PDF resume.
+## 🔧 Technical Requirements
 
-## 🪜 Steps to Use
+- Python 3.8+
+- Streamlit
+- Required packages: see `requirements.txt`
 
-1. **Install requirements**
-    - Either with `pip install -r requirements`
-    - Or with `uv sync`
-2. **Run** `streamlit run app.py`
-3. **Set up your OpenAI or Gemini API keys** (copy-paste it into the app, or create a `config.ini` file with an
-   `[OPENAI]` or `[GEMINI]` section and `API_KEY` variable).
-    - Note: if both Gemini and OpenAI API keys are provided, **Gemini** takes precedence since it has a free tier.
-4. **Upload your base resume** (supported formats: `.pdf`, `.txt`, `.docx`, `.md`).
-5. **Paste the target job description** into the provided input field.
-6. **Generate your tailored résumé** — the output is a professional PDF, optimized for the job and ready to send.
+## 📁 File Structure
 
-## 🛠️ Tech Stack
+```
+tailor-cv/
+├── home.py                          # Main dashboard
+├── pages/
+│   ├── manage_settings.py           # API configuration
+│   ├── portfolio.py                 # Portfolio management
+│   ├── new_submission.py            # Job application creation
+│   └── my_submissions.py            # Application history
+├── support/
+│   ├── extractor.py                 # AI processing engine
+│   ├── html_builder.py              # Document generation
+│   ├── supportClasses.py            # Data models
+│   ├── html_templates/              # Document templates
+│   └── submission_manager.py        # Database operations
+└── requirements.txt                  # Dependencies
+```
 
-- **Gemini-2.5-Pro** via Google Gemini free API – for free content generation and tailoring
-- **GPT-4.1** via OpenAI API – for content generation and tailoring
-- **MarkItDown** – to convert user files to structured Markdown
-- **Streamlit** for the UI
+## 🎯 Workflow
+
+1. **Setup** → Configure API keys and model preferences
+2. **Portfolio** → Upload and process your CV, create persistent portfolio
+3. **Application** → Generate tailored documents for specific jobs
+4. **Review** → Edit and refine generated documents
+5. **Export** → Download PDFs or save to database
+6. **Track** → Monitor application history and progress
+
+## 🔑 API Keys
+
+The application supports two AI models:
+
+- **OpenAI GPT-4**: Requires OpenAI API key
+- **Google Gemini**: Requires Google API key
+
+Configure your preferred model in the "Manage Settings" page.
+
+## 📝 Supported File Formats
+
+- **Input**: PDF, TXT, DOCX, MD
+- **Output**: HTML preview, PDF download
+
+## 🎨 Templates
+
+- **CV Templates**: Modern, Classic, Minimalist
+- **Cover Letter Templates**: Professional, Modern, Classic
+
+## 🚀 Running the Application
+
+```bash
+streamlit run home.py
+```
+
+## 📊 Features
+
+- **Persistent Portfolio**: Your CV data is saved and can be reused
+- **AI Tailoring**: Documents are automatically customized for specific job requirements
+- **Real-time Editing**: Edit both CV and cover letter with live preview
+- **Professional Output**: Generate high-quality PDFs for job applications
+- **Application Tracking**: Keep organized records of all submissions
+
+## 🤝 Contributing
+
+Feel free to contribute to improve the application! Areas for enhancement:
+
+- Additional CV and cover letter templates
+- More AI model integrations
+- Enhanced editing capabilities
+- Better mobile responsiveness
+- Additional export formats
+
+## 📄 License
+
+This project is open source and available under the MIT License.
