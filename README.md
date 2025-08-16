@@ -1,6 +1,12 @@
-# 🚀 AI CV Builder
 
-Your smart assistant for creating, editing, and customizing professional CVs and cover letters using AI.
+
+https://github.com/user-attachments/assets/e1bcc8dc-0d8c-46b5-aca1-9963898d2bdc
+
+# 🎯 tailor-your-CV: AI-Powered Job-Tailored Resume Generator
+
+tailor-your-CV is a powerful tool that helps users craft customized, high-impact resumes and cover letter based on job descriptions using
+LLMs. Simply upload your professional experience, paste a job description,
+and let the LLM generate a tailored curriculum vitae aligned with your target role — all based on your chosen template.
 
 ## ✨ Features
 
@@ -32,7 +38,7 @@ The application is built with a modular, multi-page structure:
 - **`support/html_templates/`** - CV and cover letter templates
 - **`support/submission_manager.py`** - Database operations for submissions
 
-## 🚀 Getting Started
+## 🚀 Workflow
 
 ### 1. Setup & Configuration
 - Navigate to "Manage Settings"
@@ -83,15 +89,6 @@ tailor-cv/
 └── requirements.txt                  # Dependencies
 ```
 
-## 🎯 Workflow
-
-1. **Setup** → Configure API keys and model preferences
-2. **Portfolio** → Upload and process your CV, create persistent portfolio
-3. **Application** → Generate tailored documents for specific jobs
-4. **Review** → Edit and refine generated documents
-5. **Export** → Download PDFs or save to database
-6. **Track** → Monitor application history and progress
-
 ## 🔑 API Keys
 
 The application supports two AI models:
@@ -99,31 +96,13 @@ The application supports two AI models:
 - **OpenAI GPT-4**: Requires OpenAI API key
 - **Google Gemini**: Requires Google API key
 
-Configure your preferred model in the "Manage Settings" page.
-
-## 📝 Supported File Formats
-
-- **Input**: PDF, TXT, DOCX, MD
-- **Output**: HTML preview, PDF download
-
-## 🎨 Templates
-
-- **CV Templates**: Modern, Classic, Minimalist
-- **Cover Letter Templates**: Professional, Modern, Classic
+Create a `config.ini` file with an `[OPENAI]` or `[GEMINI]` section and `API_KEY` variable, or copy-paste them in the "Manage Settings" page.
 
 ## 🚀 Running the Application
 
 ```bash
 streamlit run home.py
 ```
-
-## 📊 Features
-
-- **Persistent Portfolio**: Your CV data is saved and can be reused
-- **AI Tailoring**: Documents are automatically customized for specific job requirements
-- **Real-time Editing**: Edit both CV and cover letter with live preview
-- **Professional Output**: Generate high-quality PDFs for job applications
-- **Application Tracking**: Keep organized records of all submissions
 
 ## 🤝 Contributing
 
